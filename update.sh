@@ -47,70 +47,70 @@ install() {
                     exit
                 fi  
         fi
-	
-	# Get name for current folder and generate new name
-	# Copy current version into working directory
-	oldpath=$( basename "$( readlink -f ${folder} )" )
-	path=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo '')
 
-	echo -e "\e[33mCopying old install from \e[36m${oldpath}\e[33m to \e[36m${path}\e[0m"
-	cp -r ${oldpath} ${path}
+        # Get name for current folder and generate new name
+        # Copy current version into working directory
+        oldpath=$( basename "$( readlink -f ${folder} )" )
+        path=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo '')
 
-	# updating branch
-	cd ${path}	
-	git checkout ${branch}
-	git pull
-	
-	# Checking out latest tag if -t is set	
-	if [ ${tag} ]; then
-		latesttag=$(git describe --tags --abbrev=0)
-		echo -e "\e[33mChecking out \e[36m${latesttag}\e[0m"
-		git checkout ${latesttag} -q
-	fi
-	
-	# Installing new packages in composer and npm
-	composer install
-	npm install
+        echo -e "\e[33mCopying old install from \e[36m${oldpath}\e[33m to \e[36m${path}\e[0m"
+        cp -r "${oldpath}" "${path}"
 
-	# running npm compilation depending on dev option
-	if [ ${dev} == 0 ]; then
-		npm run prod
-	else
-		npm run dev
-	fi
-	
-	# Bringing current instance into maintenance mode
-	cd ../${oldpath}
-	php artisan down
-	
-	# Migrating new versions
-	cd ../${path}
-	php artisan migrate --force
-	
-	# Copy profile pictures if any were uploaded while compiling new version
-	cp -r -n ${oldpath}/public/uploads ${path}/public/uploads
-	
-	# Update symlink to newest compiled version
-	cd ..
-	echo -e "\n\n========================================="
-	echo -e "\e[33mCreating Symlink \e[36m${folder}\e[33m for \e[36m${path}"
-	ln -fsn ${path} "${folder}"
-	
-	# Delete old backup if symlink to it exists
-	if [ -L "${folder}_bak" ]; then
-		bak_path=$( basename "$( readlink -f ${folder}_bak )" )
-		echo -e "\e[33mDeleting old backup \e[36m${bak_path}\e[0m"
-		rm -rf "${bak_path}"
-	fi
-	
-	# Update backup-symlink to last version
-	echo -e "\e[33mCreating symlink for backup\e[0m"
-	ln -fsn ${oldpath} "${folder}_bak"
+        # updating branch
+        cd "${path}" || exit
+        git checkout ${branch}
+        git pull
 
-	# removing maintenance mode (should not be necessary)
-	cd ${folder}
-	php artisan up
-	echo -e "\e[32mDone. :)\e[0m"
+        # Checking out latest tag if -t is set
+        if [ ${tag} ]; then
+                latesttag=$(git describe --tags --abbrev=0)
+                echo -e "\e[33mChecking out \e[36m${latesttag}\e[0m"
+                git checkout "${latesttag}" -q
+        fi
+
+        # Installing new packages in composer and npm
+        composer install
+        npm install
+
+        # running npm compilation depending on dev option
+        if [ ${dev} == 0 ]; then
+                npm run prod
+        else
+                npm run dev
+        fi
+
+        # Bringing current instance into maintenance mode
+        cd ../"${oldpath}" || exit
+        php artisan down
+
+        # Migrating new versions
+        cd ../"${path}" || exit
+        php artisan migrate --force
+
+        # Copy profile pictures if any were uploaded while compiling new version
+        cp -r -n "${oldpath}"/public/uploads "${path}"/public/uploads
+
+        # Update symlink to newest compiled version
+        cd ..
+        echo -e "\n\n========================================="
+        echo -e "\e[33mCreating Symlink \e[36m${folder}\e[33m for \e[36m${path}"
+        ln -fsn "${path}" "${folder}"
+
+        # Delete old backup if symlink to it exists
+        if [ -L "${folder}_bak" ]; then
+                bak_path=$( basename "$( readlink -f ${folder}_bak )" )
+                echo -e "\e[33mDeleting old backup \e[36m${bak_path}\e[0m"
+                rm -rf "${bak_path}"
+        fi
+
+        # Update backup-symlink to last version
+        echo -e "\e[33mCreating symlink for backup\e[0m"
+        ln -fsn "${oldpath}" "${folder}_bak"
+
+        # removing maintenance mode (should not be necessary)
+        cd ${folder} || exit
+        php artisan up
+        echo -e "\e[32mDone. :)\e[0m"
 }
 
 
@@ -130,4 +130,4 @@ do
         ?) print_help ;;
     esac
 done
-	install
+        install
