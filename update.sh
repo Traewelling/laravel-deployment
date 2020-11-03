@@ -86,12 +86,12 @@ install() {
         fi
 
         # Bringing current instance into maintenance mode
-	popd || exit 1
+	popd > /dev/null || exit 1
         pushd "${oldpath}" > /dev/null || exit 1
         php artisan down || exit 1
 
         # Migrating new versions
-	popd || exit 1
+	popd > /dev/null || exit 1
         pushd "${path}" > /dev/null || exit 1
         php artisan migrate --force
 	
@@ -107,10 +107,10 @@ install() {
 	php artisan auth:clear-resets
 	
         # Copy profile pictures if any were uploaded while compiling new version
-        cp -r -n "${oldpath}"/public/uploads "${path}"/public/uploads
+	popd > /dev/null || exit 1
+        cp -r -n "${oldpath}"/public/uploads "${path}"/public/uploads	
 
         # Update symlink to newest compiled version
-        popd || exit 1
         echo -e "\n\n========================================="
         echo -e "\e[33mCreating Symlink \e[36m${folder}\e[33m for \e[36m${path}"
         ln -fsn "${path}" "${folder}"

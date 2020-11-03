@@ -110,7 +110,7 @@ install() {
         php artisan passport:install
 
         # Creating symlink
-        popd || exit
+        popd > /dev/null || exit
         echo -e "\n\n========================================="
         echo -e "\e[33mCreating Symlink \e[0m${folder}\e[33m for \e[0m${path}"
         ln -s "${path}" ${folder}
