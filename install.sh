@@ -85,8 +85,14 @@ install() {
         read -n 1 -s -r -p ""
 
         # Installing composer and npm packages
-        composer install
-        npm install
+        if [ ${dev} == 0 ]; then
+                composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+                npm ci --only=prod
+        else
+                composer install --no-interaction --prefer-dist --optimize-autoloader
+                npm ci
+        fi  
+
 
         # Generating application key
         php artisan key:generate

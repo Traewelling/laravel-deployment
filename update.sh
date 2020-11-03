@@ -73,13 +73,15 @@ install() {
         fi
 
         # Installing new packages in composer and npm
-        composer install
-        npm install
-
         # running npm compilation depending on dev option
         if [ ${dev} == 0 ]; then
-                npm run prod
+        	composer install --no-interaction --prefer-dist --no-dev
+        	#composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+	        npm ci --only=prod
+	        npm run prod
         else
+		composer install --no-interaction --prefer-dist --optimize-autoloader
+		npm ci
                 npm run dev
         fi
 
