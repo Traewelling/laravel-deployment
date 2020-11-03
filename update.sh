@@ -87,12 +87,23 @@ install() {
 
         # Bringing current instance into maintenance mode
         cd ../"${oldpath}" || exit
-        php artisan down
+        php artisan down || exit 1
 
         # Migrating new versions
         cd ../"${path}" || exit
         php artisan migrate --force
-
+	
+	# Erase cache
+	php artisan cache:clear
+	# Clear and cache routes
+	php artisan route:clear
+	php artisan route:cache
+	# Clear and cache config
+	php artisan config:clear
+	php artisan config:cache
+	# Clear expired password reset tokens
+	php artisan auth:clear-resets
+	
         # Copy profile pictures if any were uploaded while compiling new version
         cp -r -n "${oldpath}"/public/uploads "${path}"/public/uploads
 
