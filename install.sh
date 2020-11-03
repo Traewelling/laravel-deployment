@@ -66,7 +66,7 @@ install() {
         # cloning project into new path and checking out branch
         echo -e "\e[33mCloning project\e[0m"
         git clone ${repo} "${path}"
-        cd "${path}" || exit
+        pushd "${path}" > /dev/null|| exit
         git checkout ${branch}
 
         # Checking out latest tag if -t is set
@@ -110,7 +110,7 @@ install() {
         php artisan passport:install
 
         # Creating symlink
-        cd ..
+        popd || exit
         echo -e "\n\n========================================="
         echo -e "\e[33mCreating Symlink \e[0m${folder}\e[33m for \e[0m${path}"
         ln -s "${path}" ${folder}
@@ -122,7 +122,7 @@ install() {
 # Get options
 # --------
 
-while getopts e:b:p:r:dhtf OPT
+while getopts e:b:n:r:dhtf OPT
 do
     case "$OPT" in
         h) print_help ;;

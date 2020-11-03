@@ -61,7 +61,7 @@ install() {
         cp -r "${oldpath}" "${path}"
 
         # updating branch
-        cd "${path}" || exit
+        pushd "${path}" > /dev/null || exit 1
         git checkout ${branch}
         git pull
 
@@ -86,11 +86,13 @@ install() {
         fi
 
         # Bringing current instance into maintenance mode
-        cd ../"${oldpath}" || exit
+	popd || exit 1
+        pushd "${oldpath}" > /dev/null || exit 1
         php artisan down || exit 1
 
         # Migrating new versions
-        cd ../"${path}" || exit
+	popd || exit 1
+        pushd "${path}" > /dev/null || exit 1
         php artisan migrate --force
 	
 	# Erase cache
@@ -108,7 +110,7 @@ install() {
         cp -r -n "${oldpath}"/public/uploads "${path}"/public/uploads
 
         # Update symlink to newest compiled version
-        cd ..
+        popd || exit 1
         echo -e "\n\n========================================="
         echo -e "\e[33mCreating Symlink \e[36m${folder}\e[33m for \e[36m${path}"
         ln -fsn "${path}" "${folder}"
@@ -125,7 +127,7 @@ install() {
         ln -fsn "${oldpath}" "${folder}_bak"
 
         # removing maintenance mode (should not be necessary)
-        cd ${folder} || exit
+        pushd ${folder} > /dev/null || exit
         php artisan up
         echo -e "\e[32mDone. :)\e[0m"
 }
