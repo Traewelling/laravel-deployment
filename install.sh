@@ -11,7 +11,7 @@ print_help() {
 # Display Help
    echo "Installer for Laravel projects"
    echo
-   echo "Syntax: install.sh [-|h|d|t|f] [-b BRANCHNAME] [-r REPO_URL]"
+   echo "Syntax: install.sh [-|h|d|t|f] [-b BRANCHNAME] [-r REPO_URL] [-n PATH_NAME]"
    echo "options:"
    echo "  -d"
    echo -e "\tInstalls with seeding in the migration and npm run dev"
@@ -21,8 +21,13 @@ print_help() {
    echo -e "\tSkips confirmation of settings at begin of script"
    echo "  -r REPO_URL"
    echo -e "\tSets the url for the to be installed repo"
+   echo -e "\tDefaults to ${repo}"
    echo "  -b BRANCHNAME"
    echo -e "\tChecks out the repo with the supplied branch"
+   echo -e "\tDefaults to ${branch}"
+   echo "  -n PATH_NAME"
+   echo -e "\tSets the symlink name for the repo to be installed to"
+   echo -e "\tDefaults to ${folder}"
    echo "  -h"
    echo -e "\tPrint this Help."
 
@@ -116,7 +121,7 @@ do
     case "$OPT" in
         h) print_help ;;
         b) branch=$OPTARG;;
-        p) folder=$OPTARG;;
+        n) folder=$OPTARG;;
         r) repo=$OPTARG;;
         d) dev=1;;
         t) tag=1;;

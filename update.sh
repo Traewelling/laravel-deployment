@@ -10,7 +10,7 @@ print_help() {
 # Display Help
    echo "Updater for Laravel projects"
    echo
-   echo "Syntax: update.sh [-|h|d|t|f] [-b BRANCHNAME]"
+   echo "Syntax: update.sh [-|h|d|t|f] [-b BRANCHNAME] [-n PATH_NAME]"
    echo "options:"
    echo "  -d"
    echo -e "\tUpdates with npm run dev"
@@ -20,6 +20,10 @@ print_help() {
    echo -e "\tSkips confirmation of settings at begin of script"
    echo "  -b BRANCHNAME"
    echo -e "\tChecks out the repo with the supplied branch"
+   echo -e "\tDefaults to ${branch}"
+   echo "  -n PATH_NAME"
+   echo -e "\tSets the symlink name for the repo to be installed to"
+   echo -e "\tDefaults to ${folder}"
    echo "  -h"
    echo -e "\tPrint this Help."
    
@@ -118,12 +122,12 @@ install() {
 # Get options
 # --------
 
-while getopts e:b:p:dhtf OPT
+while getopts e:b:n:dhtf OPT
 do
     case "$OPT" in
         h) print_help ;;
         b) branch=$OPTARG;;
-        p) folder=$OPTARG;;
+        n) folder=$OPTARG;;
         d) dev=1;;
         t) tag=1;;
         f) force=1;;
